@@ -3,6 +3,7 @@ package compiler;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 public class Toolbar extends JToolBar {
 
@@ -29,9 +30,20 @@ public class Toolbar extends JToolBar {
         addButton("colar [ctrl-v]",    Icons.PASTE,   () -> editor.textArea().paste());
         addButton("recortar [ctrl-x]", Icons.CUT,     () -> editor.textArea().cut());
         addSeparator();
-        addButton("compilar [F7]",     Icons.COMPILE, () -> messages.showCompilar());
+        addButton("compilar [F7]",     Icons.COMPILE, this::compilar);
         addSeparator();
         addButton("equipe [F1]",       Icons.TEAM,    () -> messages.showEquipe());
+    }
+
+    private void compilar() {
+        String fonte = editor.textArea().getText();
+        AnalisadorLexico lexer = new AnalisadorLexico(fonte);
+        try {
+            List<Token> tokens = lexer.analisar();
+            messages.showTokens(tokens);
+        } catch (ErroLexico e) {
+            messages.showErro(e.getMessage());
+        }
     }
 
     private void addButton(String label, Icons icon, Runnable action) {
@@ -48,7 +60,6 @@ public class Toolbar extends JToolBar {
         add(button);
     }
 
-    /** Icon types and their factory */
     enum Icons {
         NEW, OPEN, SAVE, COPY, PASTE, CUT, COMPILE, TEAM;
 

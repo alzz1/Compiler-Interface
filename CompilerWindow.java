@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 public class CompilerWindow extends JFrame {
 
@@ -13,9 +14,9 @@ public class CompilerWindow extends JFrame {
     private final FileManager  fileManager;
 
     public CompilerWindow() {
-        editor     = new EditorPanel();
-        messages   = new MessagePanel();
-        statusBar  = new StatusBar();
+        editor      = new EditorPanel();
+        messages    = new MessagePanel();
+        statusBar   = new StatusBar();
         fileManager = new FileManager(this, editor, messages, statusBar);
 
         setTitle("Compilador");
@@ -33,7 +34,8 @@ public class CompilerWindow extends JFrame {
     }
 
     private JSplitPane buildSplitPane() {
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, editor.scrollPane(), messages.scrollPane());
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                editor.scrollPane(), messages.scrollPane());
         split.setDividerLocation(500);
         split.setDividerSize(6);
         split.setResizeWeight(0.7);
@@ -41,11 +43,22 @@ public class CompilerWindow extends JFrame {
     }
 
     private void registerShortcuts() {
-        bindKey(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK, "novo",     () -> fileManager.novo());
-        bindKey(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK, "abrir",    () -> fileManager.abrir());
-        bindKey(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, "salvar",   () -> fileManager.salvar());
-        bindKey(KeyEvent.VK_F7, 0,                        "compilar", () -> messages.showCompilar());
-        bindKey(KeyEvent.VK_F1, 0,                        "equipe",   () -> messages.showEquipe());
+        bindKey(KeyEvent.VK_N,  InputEvent.CTRL_DOWN_MASK, "novo",     () -> fileManager.novo());
+        bindKey(KeyEvent.VK_O,  InputEvent.CTRL_DOWN_MASK, "abrir",    () -> fileManager.abrir());
+        bindKey(KeyEvent.VK_S,  InputEvent.CTRL_DOWN_MASK, "salvar",   () -> fileManager.salvar());
+        bindKey(KeyEvent.VK_F7, 0,                         "compilar", this::compilar);
+        bindKey(KeyEvent.VK_F1, 0,                         "equipe",   () -> messages.showEquipe());
+    }
+
+    private void compilar() {
+        String fonte = editor.textArea().getText();
+        AnalisadorLexico lexer = new AnalisadorLexico(fonte);
+        try {
+            List<Token> tokens = lexer.analisar();
+            messages.showTokens(tokens);
+        } catch (ErroLexico e) {
+            messages.showErro(e.getMessage());
+        }
     }
 
     private void bindKey(int keyCode, int modifiers, String name, Runnable action) {
