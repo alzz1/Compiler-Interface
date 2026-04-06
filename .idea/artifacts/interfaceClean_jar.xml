@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="interfaceClean:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/interfaceClean_jar</output-path>
+    <root id="archive" name="interfaceClean.jar">
+      <element id="module-output" name="interfaceClean" />
+    </root>
+  </artifact>
+</component>

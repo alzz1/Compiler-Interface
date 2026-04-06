@@ -64,7 +64,7 @@ public class AnalisadorLexico {
         // letra maiúscula → identificador inválido
         if (atual() >= 'A' && atual() <= 'Z') {
             int linhaToken = linha;
-            while (pos < tamanho && !isSeparador(atual())) pos++;
+            while (pos < tamanho && isSeparador(atual())) pos++;
             throw new ErroLexico(linhaToken, "linha " + linhaToken + ": identificador inválido");
         }
 
@@ -174,12 +174,12 @@ public class AnalisadorLexico {
             sb.append('.');
             pos++;
             if (pos >= tamanho || !Character.isDigit(atual())) {
-                while (pos < tamanho && !isSeparador(atual())) pos++;
+                while (pos < tamanho && isSeparador(atual())) pos++;
                 throw new ErroLexico(linhaToken, "linha " + linhaToken + ": constante_float inválida");
             }
             while (pos < tamanho && Character.isDigit(atual())) sb.append(fonte.charAt(pos++));
             if (pos < tamanho && (atual() >= 'a' && atual() <= 'z' || atual() == '_')) {
-                while (pos < tamanho && !isSeparador(atual())) pos++;
+                while (pos < tamanho && isSeparador(atual())) pos++;
                 throw new ErroLexico(linhaToken, "linha " + linhaToken + ": constante_float inválida");
             }
             return new Token(linhaToken, Token.Classe.CONSTANTE_FLOAT, sb.toString());
@@ -187,7 +187,7 @@ public class AnalisadorLexico {
 
         // Letra colada = inválido
         if (pos < tamanho && (atual() >= 'a' && atual() <= 'z' || atual() == '_')) {
-            while (pos < tamanho && !isSeparador(atual())) pos++;
+            while (pos < tamanho && isSeparador(atual())) pos++;
             throw new ErroLexico(linhaToken, "linha " + linhaToken + ": identificador inválido");
         }
 
@@ -215,13 +215,13 @@ public class AnalisadorLexico {
                 sb.append('_'); pos++;
                 if (pos >= tamanho || !Character.isDigit(atual())) {
                     // '_' sem dígitos depois → inválido
-                    while (pos < tamanho && !isSeparador(atual())) pos++;
+                    while (pos < tamanho && isSeparador(atual())) pos++;
                     throw new ErroLexico(linhaToken, "linha " + linhaToken + ": identificador inválido");
                 }
                 while (pos < tamanho && Character.isDigit(atual())) { sb.append(atual()); pos++; }
                 // Depois de _dígitos só pode vir separador, letra minúscula ou outro _
                 if (pos < tamanho && atual() >= 'A' && atual() <= 'Z') {
-                    while (pos < tamanho && !isSeparador(atual())) pos++;
+                    while (pos < tamanho && isSeparador(atual())) pos++;
                     throw new ErroLexico(linhaToken, "linha " + linhaToken + ": identificador inválido");
                 }
             } else {
@@ -267,10 +267,10 @@ public class AnalisadorLexico {
     private char atual() { return fonte.charAt(pos); }
 
     private boolean isSeparador(char c) {
-        return Character.isWhitespace(c) || c == ';' || c == ',' || c == '('
-                || c == ')' || c == ':' || c == '+' || c == '-' || c == '*'
-                || c == '/' || c == '=' || c == '<' || c == '>' || c == '!'
-                || c == '&' || c == '|' || c == '^' || c == '"' || c == '\''
-                || c == '{' || c == '$';
+        return !Character.isWhitespace(c) && c != ';' && c != ',' && c != '('
+                && c != ')' && c != ':' && c != '+' && c != '-' && c != '*'
+                && c != '/' && c != '=' && c != '<' && c != '>' && c != '!'
+                && c != '&' && c != '|' && c != '^' && c != '"' && c != '\''
+                && c != '{' && c != '$';
     }
 }

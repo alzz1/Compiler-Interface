@@ -43,11 +43,11 @@ public class CompilerWindow extends JFrame {
     }
 
     private void registerShortcuts() {
-        bindKey(KeyEvent.VK_N,  InputEvent.CTRL_DOWN_MASK, "novo",     () -> fileManager.novo());
-        bindKey(KeyEvent.VK_O,  InputEvent.CTRL_DOWN_MASK, "abrir",    () -> fileManager.abrir());
-        bindKey(KeyEvent.VK_S,  InputEvent.CTRL_DOWN_MASK, "salvar",   () -> fileManager.salvar());
+        bindKey(KeyEvent.VK_N,  InputEvent.CTRL_DOWN_MASK, "novo", fileManager::novo);
+        bindKey(KeyEvent.VK_O,  InputEvent.CTRL_DOWN_MASK, "abrir", fileManager::abrir);
+        bindKey(KeyEvent.VK_S,  InputEvent.CTRL_DOWN_MASK, "salvar", fileManager::salvar);
         bindKey(KeyEvent.VK_F7, 0,                         "compilar", this::compilar);
-        bindKey(KeyEvent.VK_F1, 0,                         "equipe",   () -> messages.showEquipe());
+        bindKey(KeyEvent.VK_F1, 0,                         "equipe", messages::showEquipe);
     }
 
     private void compilar() {
