@@ -1,0 +1,29 @@
+#Options
+GenerateScanner = true
+GenerateParser = false
+Language = Java
+ScannerName = Lexico
+ScannerCaseSensitive = true
+ScannerTable = Compact
+Input = Stream
+#RegularDefinitions
+min: [a-z]
+mai: [A-Z]
+under:/_ 
+digito: [0-9]
+ponto:\. 
+
+#Tokens
+identificador:! {min}({under} {digito}+|{min})*
+
+cte_int:! {digito}+
+
+cte_float:! {digito}+{ponto}{digito}+
+
+cte_char:! \\(n|s|t)
+
+cte_string:! \"([^\n\\%\"]|%x)*\"
+
+comentario_de_linha:! $[^\n]*
+
+comentario_de_bloco:! \{\n[^\{\}]*\n\}

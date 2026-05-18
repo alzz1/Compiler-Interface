@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.List;
 
 public class CompilerWindow extends JFrame {
 
@@ -26,7 +25,7 @@ public class CompilerWindow extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        add(new Toolbar(editor, fileManager, messages), BorderLayout.NORTH);
+        add(new Toolbar(editor, fileManager, messages, this), BorderLayout.NORTH);
         add(buildSplitPane(), BorderLayout.CENTER);
         add(statusBar, BorderLayout.SOUTH);
 
@@ -43,21 +42,41 @@ public class CompilerWindow extends JFrame {
     }
 
     private void registerShortcuts() {
-        bindKey(KeyEvent.VK_N,  InputEvent.CTRL_DOWN_MASK, "novo", fileManager::novo);
-        bindKey(KeyEvent.VK_O,  InputEvent.CTRL_DOWN_MASK, "abrir", fileManager::abrir);
-        bindKey(KeyEvent.VK_S,  InputEvent.CTRL_DOWN_MASK, "salvar", fileManager::salvar);
+        bindKey(KeyEvent.VK_N,  InputEvent.CTRL_DOWN_MASK, "novo",     () -> fileManager.novo());
+        bindKey(KeyEvent.VK_O,  InputEvent.CTRL_DOWN_MASK, "abrir",    () -> fileManager.abrir());
+        bindKey(KeyEvent.VK_S,  InputEvent.CTRL_DOWN_MASK, "salvar",   () -> fileManager.salvar());
         bindKey(KeyEvent.VK_F7, 0,                         "compilar", this::compilar);
-        bindKey(KeyEvent.VK_F1, 0,                         "equipe", messages::showEquipe);
+        bindKey(KeyEvent.VK_F1, 0,                         "equipe",   () -> messages.showEquipe());
     }
 
-    private void compilar() {
+    /** Executa análise léxica + sintática conforme enunciado parte 3. */
+    public void compilar() {
         String fonte = editor.textArea().getText();
-        AnalisadorLexico lexer = new AnalisadorLexico(fonte);
+        messages.clear();
+
+        Lexico lexico = new Lexico();
+        lexico.setInput(fonte);
+
         try {
-            List<Token> tokens = lexer.analisar();
-            messages.showTokens(tokens);
-        } catch (ErroLexico e) {
+            Sintatico sintatico = new Sintatico();
+            sintatico.parse(lexico);
+            messages.showSucesso();
+        } catch (LexicalError e) {
             messages.showErro(e.getMessage());
+        } catch (SyntaticError e) {
+            messages.showErro(e.getMessage());
+        } catch (RuntimeException e) {
+            // erros léxicos lançados como RuntimeException pelo Lexico
+            String msg = e.getMessage();
+            if (msg == null) msg = "Erro desconhecido";
+            if (msg.startsWith("COMENTARIO_INVALIDO:")) {
+                String linha = msg.split(":")[1];
+                messages.showErro("linha " + linha + ": comentário inválido ou não finalizado");
+            } else if (msg.startsWith("LEXICO_ERRO:")) {
+                messages.showErro(msg.replace("LEXICO_ERRO:", ""));
+            } else {
+                messages.showErro(msg);
+            }
         }
     }
 

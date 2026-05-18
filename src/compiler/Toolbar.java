@@ -3,21 +3,23 @@ package compiler;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 public class Toolbar extends JToolBar {
 
     private static final Dimension BUTTON_SIZE = new Dimension(90, 60);
     private static final Font      BUTTON_FONT = new Font("SansSerif", Font.PLAIN, 10);
 
-    private final EditorPanel  editor;
-    private final FileManager  fileManager;
-    private final MessagePanel messages;
+    private final EditorPanel    editor;
+    private final FileManager    fileManager;
+    private final MessagePanel   messages;
+    private final CompilerWindow window;
 
-    public Toolbar(EditorPanel editor, FileManager fileManager, MessagePanel messages) {
+    public Toolbar(EditorPanel editor, FileManager fileManager,
+                   MessagePanel messages, CompilerWindow window) {
         this.editor      = editor;
         this.fileManager = fileManager;
         this.messages    = messages;
+        this.window      = window;
 
         setFloatable(false);
         setPreferredSize(new Dimension(0, 70));
@@ -30,20 +32,9 @@ public class Toolbar extends JToolBar {
         addButton("colar [ctrl-v]",    Icons.PASTE,   () -> editor.textArea().paste());
         addButton("recortar [ctrl-x]", Icons.CUT,     () -> editor.textArea().cut());
         addSeparator();
-        addButton("compilar [F7]",     Icons.COMPILE, this::compilar);
+        addButton("compilar [F7]",     Icons.COMPILE, () -> window.compilar());
         addSeparator();
         addButton("equipe [F1]",       Icons.TEAM,    () -> messages.showEquipe());
-    }
-
-    private void compilar() {
-        String fonte = editor.textArea().getText();
-        AnalisadorLexico lexer = new AnalisadorLexico(fonte);
-        try {
-            List<Token> tokens = lexer.analisar();
-            messages.showTokens(tokens);
-        } catch (ErroLexico e) {
-            messages.showErro(e.getMessage());
-        }
     }
 
     private void addButton(String label, Icons icon, Runnable action) {
@@ -78,7 +69,7 @@ public class Toolbar extends JToolBar {
                     g.setColor(new Color(70, 130, 180));
                     g.fillRect(4, 2, 12, 16);
                     g.setColor(Color.WHITE);
-                    g.fillPolygon(new int[]{12, 16, 16}, new int[]{2, 6, 2}, 3);
+                    g.fillPolygon(new int[]{12,16,16}, new int[]{2,6,2}, 3);
                     g.setColor(new Color(50, 100, 150));
                     g.drawRect(4, 2, 12, 16);
                     g.drawLine(12, 2, 16, 6);
@@ -133,9 +124,9 @@ public class Toolbar extends JToolBar {
                 }
                 case COMPILE -> {
                     g.setColor(new Color(80, 180, 80));
-                    g.fillPolygon(new int[]{4, 20, 4}, new int[]{2, 12, 22}, 3);
+                    g.fillPolygon(new int[]{4,20,4}, new int[]{2,12,22}, 3);
                     g.setColor(new Color(40, 140, 40));
-                    g.drawPolygon(new int[]{4, 20, 4}, new int[]{2, 12, 22}, 3);
+                    g.drawPolygon(new int[]{4,20,4}, new int[]{2,12,22}, 3);
                 }
                 case TEAM -> {
                     g.setColor(new Color(70, 130, 180));

@@ -1,33 +1,24 @@
 package compiler;
-/** Representa um token reconhecido pelo analisador léxico. */
-public class Token {
 
-    public enum Classe {
-        SIMBOLO_ESPECIAL  ("símbolo especial"),
-        PALAVRA_RESERVADA ("palavra reservada"),
-        IDENTIFICADOR     ("identificador"),
-        CONSTANTE_INT     ("constante_int"),
-        CONSTANTE_FLOAT   ("constante_float"),
-        CONSTANTE_CHAR    ("constante_char"),
-        CONSTANTE_STRING  ("constante_string");
+public class Token
+{
+    private int    id;
+    private String lexeme;
+    private int    position;
 
-        private final String descricao;
-        Classe(String descricao) { this.descricao = descricao; }
-        public String descricao() { return descricao; }
+    public Token(int id, String lexeme, int position)
+    {
+        this.id       = id;
+        this.lexeme   = lexeme;
+        this.position = position;
     }
 
-    public final int    linha;
-    public final Classe classe;
-    public final String lexema;
+    public final int    getId()      { return id; }
+    public final String getLexeme()  { return lexeme; }
+    public final int    getPosition(){ return position; }
 
-    public Token(int linha, Classe classe, String lexema) {
-        this.linha  = linha;
-        this.classe = classe;
-        this.lexema = lexema;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("linha %d   %-20s %s", linha, classe.descricao(), lexema);
+    public String toString()
+    {
+        return id + " ( " + lexeme + " ) @ " + position;
     }
 }
