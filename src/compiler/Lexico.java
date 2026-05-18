@@ -9,28 +9,29 @@ public class Lexico implements Constants
 {
     private static final Map<String, Integer> PALAVRAS_RESERVADAS = new HashMap<>();
     static {
-        PALAVRAS_RESERVADAS.put("ask",    t_ask);
-        PALAVRAS_RESERVADAS.put("bool",   t_bool);
-        PALAVRAS_RESERVADAS.put("char",   t_char);
+        PALAVRAS_RESERVADAS.put("main",   t_main);
         PALAVRAS_RESERVADAS.put("define", t_define);
-        PALAVRAS_RESERVADAS.put("end",    t_end);
+        PALAVRAS_RESERVADAS.put("if",     t_if);
         PALAVRAS_RESERVADAS.put("elif",   t_elif);
         PALAVRAS_RESERVADAS.put("else",   t_else);
-        PALAVRAS_RESERVADAS.put("false",  t_false);
-        PALAVRAS_RESERVADAS.put("float",  t_float);
-        PALAVRAS_RESERVADAS.put("if",     t_if);
-        PALAVRAS_RESERVADAS.put("int",    t_int);
-        PALAVRAS_RESERVADAS.put("main",   t_main);
+        PALAVRAS_RESERVADAS.put("end",    t_end);
         PALAVRAS_RESERVADAS.put("repeat", t_repeat);
-        PALAVRAS_RESERVADAS.put("string", t_string);
+        PALAVRAS_RESERVADAS.put("while",  t_while);
+        PALAVRAS_RESERVADAS.put("until",  t_until);
+        PALAVRAS_RESERVADAS.put("ask",    t_ask);
         PALAVRAS_RESERVADAS.put("tell",   t_tell);
         PALAVRAS_RESERVADAS.put("true",   t_true);
-        PALAVRAS_RESERVADAS.put("until",  t_until);
-        PALAVRAS_RESERVADAS.put("while",  t_while);
+        PALAVRAS_RESERVADAS.put("false",  t_false);
+        PALAVRAS_RESERVADAS.put("int",    t_int);
+        PALAVRAS_RESERVADAS.put("float",  t_float);
+        PALAVRAS_RESERVADAS.put("string", t_string);
+        PALAVRAS_RESERVADAS.put("bool",   t_bool);
+        PALAVRAS_RESERVADAS.put("char",   t_char);
     }
 
     private List<Token> tokensPreProcessados;
     private int         tokenIndex;
+    private LexicalError erroLexico = null;
 
     public Lexico() {}
 
@@ -53,16 +54,13 @@ public class Lexico implements Constants
         src = src.replace("\r\n", "\n").replace("\r", "\n");
         tokensPreProcessados = new ArrayList<>();
         tokenIndex = 0;
+        erroLexico = null;
         try {
             processarTexto(src);
         } catch (LexicalError e) {
-            // armazena para lançar no nextToken()
             erroLexico = e;
         }
     }
-
-    // erro léxico encontrado durante o pré-processamento
-    private LexicalError erroLexico = null;
 
     private void processarTexto(String src) throws LexicalError
     {
@@ -73,7 +71,7 @@ public class Lexico implements Constants
         {
             char c = src.charAt(i);
 
-            // Pula espaços e tabulações
+            // Espaços e tabulações
             if (c == ' ' || c == '\t') { i++; continue; }
 
             // Quebra de linha
@@ -90,10 +88,10 @@ public class Lexico implements Constants
             if (c == '{')
             {
                 int linhaInicio = linha;
-                i++; // pula {
+                i++;
                 if (i >= src.length() || src.charAt(i) != '\n')
                     throw new LexicalError("linha " + linhaInicio + ": comentário inválido ou não finalizado", linhaInicio);
-                i++; linha++; // pula \n
+                i++; linha++;
 
                 boolean fechou = false;
                 while (i < src.length())
@@ -104,7 +102,7 @@ public class Lexico implements Constants
                         i++; linha++;
                         if (i < src.length() && src.charAt(i) == '}')
                         {
-                            i++; // pula }
+                            i++;
                             fechou = true;
                             break;
                         }
@@ -297,7 +295,6 @@ public class Lexico implements Constants
 
     public Token nextToken() throws LexicalError
     {
-        // propaga erro léxico encontrado no pré-processamento
         if (erroLexico != null) throw erroLexico;
         if (tokenIndex >= tokensPreProcessados.size()) return null;
         return tokensPreProcessados.get(tokenIndex++);
@@ -314,10 +311,10 @@ public class Lexico implements Constants
             case t_cte_float:     return "constante_float";
             case t_cte_char:      return "constante_char";
             case t_cte_string:    return "constante_string";
-            case t_ask: case t_bool: case t_char: case t_define: case t_end:
-            case t_elif: case t_else: case t_false: case t_float: case t_if:
-            case t_int: case t_main: case t_repeat: case t_string: case t_tell:
-            case t_true: case t_until: case t_while:
+            case t_main: case t_define: case t_if: case t_elif: case t_else:
+            case t_end: case t_repeat: case t_while: case t_until: case t_ask:
+            case t_tell: case t_true: case t_false: case t_int: case t_float:
+            case t_string: case t_bool: case t_char:
             return "palavra reservada";
             default:
                 return "símbolo especial";

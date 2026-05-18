@@ -1,6 +1,6 @@
 package compiler;
 
-public interface ParserConstants extends Constants
+public interface ParserConstants
 {
     int START_SYMBOL = 46;
 
@@ -179,14 +179,15 @@ public interface ParserConstants extends Constants
                     /* "Era esperado \"*\""  */            "encontrado %s esperado *",
                     /* "Era esperado \"/\""  */            "encontrado %s esperado /",
                     /* "Era esperado \"^\""  */            "encontrado %s esperado ^",
+                    // --- Não-terminais (índice 46 em diante) ---
                     /* "<programa> inválido"             */ "encontrado %s esperado main",
-                    /* "<decl_variaveis> inválido"       */ "encontrado %s esperado define end",
-                    /* "<repete> inválido"               */ "encontrado %s esperado repeat",
+                    /* "<decl_variaveis> inválido"       */ "encontrado %s esperado define",
+                    /* "<repete> inválido"               */ "encontrado %s esperado bool char float int string",
                     /* "<tipo> inválido"                 */ "encontrado %s esperado bool char float int string",
                     /* "<lista_id> inválido"             */ "encontrado %s esperado identificador",
-                    /* "<lista_id_> inválido"            */ "encontrado %s esperado , :",
+                    /* "<lista_id_> inválido"            */ "encontrado %s esperado , ;",
                     /* "<lista_instrucoes> inválido"     */ "encontrado %s esperado identificador ask if repeat tell",
-                    /* "<lista_instrucoes_> inválido"    */ "encontrado %s esperado identificador ask if repeat tell end elif else until",
+                    /* "<lista_instrucoes_> inválido"    */ "encontrado %s esperado identificador ask if repeat tell end elif else until while",
                     /* "<instrucao> inválido"            */ "encontrado %s esperado identificador ask if repeat tell",
                     /* "<atribuicao> inválido"           */ "encontrado %s esperado identificador",
                     /* "<atribuicao_> inválido"          */ "encontrado %s esperado = <-",

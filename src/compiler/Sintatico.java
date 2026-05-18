@@ -2,7 +2,7 @@ package compiler;
 
 import java.util.Stack;
 
-public class Sintatico implements ParserConstants
+public class Sintatico implements Constants
 {
     private Stack<Integer> stack = new Stack<>();
     private Token currentToken;
@@ -21,11 +21,10 @@ public class Sintatico implements ParserConstants
 
     private boolean step() throws LexicalError, SyntaticError
     {
+        // Se não há mais tokens, representa EOF ($)
         if (currentToken == null)
         {
-            int pos = 0;
-            if (previousToken != null)
-                pos = previousToken.getPosition() + previousToken.getLexeme().length();
+            int pos = (previousToken != null) ? previousToken.getPosition() : 1;
             currentToken = new Token(DOLLAR, "$", pos);
         }
 
@@ -51,6 +50,7 @@ public class Sintatico implements ParserConstants
             }
             else
             {
+                // Erro: terminal esperado não encontrado
                 String msg = String.format(
                         "linha %d: " + PARSER_ERROR[x],
                         currentToken.getPosition(),
@@ -64,11 +64,10 @@ public class Sintatico implements ParserConstants
                 return false;
             else
             {
-                // não-terminais começam em FIRST_NON_TERMINAL=46
-                // PARSER_ERROR[0..45] = terminais, PARSER_ERROR[46..] = não-terminais
-                int errorIndex = x; // x já é o índice direto em PARSER_ERROR
+                // x é o índice direto em PARSER_ERROR
+                // terminais: índices 0..45, não-terminais: índices 46+
                 String msg = String.format(
-                        "linha %d: " + PARSER_ERROR[errorIndex],
+                        "linha %d: " + PARSER_ERROR[x],
                         currentToken.getPosition(),
                         foundLabel(currentToken));
                 throw new SyntaticError(msg, currentToken.getPosition());
@@ -76,7 +75,7 @@ public class Sintatico implements ParserConstants
         }
         else
         {
-            // ação semântica — ignorada nesta fase
+            // Ação semântica — ignorada nesta fase
             return false;
         }
     }
@@ -96,18 +95,18 @@ public class Sintatico implements ParserConstants
 
     /**
      * Retorna o rótulo do token encontrado conforme as regras do enunciado:
-     *  - EOF ($)            → "EOF"
-     *  - constante_string   → "constante_string"
-     *  - identificador, cte_int, cte_float, cte_char → lexema
-     *  - palavra reservada  → lexema
-     *  - símbolo especial   → lexema
+     *  - EOF ($)          → "EOF"
+     *  - constante_string → "constante_string"
+     *  - qualquer outro   → lexema (identificador, palavra reservada,
+     *                               símbolo especial, constante_int,
+     *                               constante_float, constante_char)
      */
     private String foundLabel(Token t)
     {
         if (t == null) return "EOF";
         int id = t.getId();
-        if (id == DOLLAR)           return "EOF";
-        if (id == t_cte_string)     return "constante_string";
+        if (id == DOLLAR)       return "EOF";
+        if (id == t_cte_string) return "constante_string";
         return t.getLexeme();
     }
 
